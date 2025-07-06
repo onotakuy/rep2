@@ -1,0 +1,210 @@
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode/csvtoexcel$ cd ..
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ ls
+csvtoexcel  gemini-cli  samp20250628  snow1
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ mkdir csvtoexcel2
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ cd  csvtoexcel2
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode/csvtoexcel2$ ls
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode/csvtoexcel2$ gemini
+
+ ███            █████████  ██████████ ██████   ██████ █████ ██████   █████ █████
+░░░███         ███░░░░░███░░███░░░░░█░░██████ ██████ ░░███ ░░██████ ░░███ ░░███
+  ░░░███      ███     ░░░  ░███  █ ░  ░███░█████░███  ░███  ░███░███ ░███  ░███
+    ░░░███   ░███          ░██████    ░███░░███ ░███  ░███  ░███░░███░███  ░███
+     ███░    ░███    █████ ░███░░█    ░███ ░░░  ░███  ░███  ░███ ░░██████  ░███
+   ███░      ░░███  ░░███  ░███ ░   █ ░███      ░███  ░███  ░███  ░░█████  ░███
+ ███░         ░░█████████  ██████████ █████     █████ █████ █████  ░░█████ █████
+░░░            ░░░░░░░░░  ░░░░░░░░░░ ░░░░░     ░░░░░ ░░░░░ ░░░░░    ░░░░░ ░░░░░
+
+
+Tips for getting started:
+1. Ask questions, edit files, or run commands.
+2. Be specific for the best results.
+3. Create GEMINI.md files to customize your interactions with Gemini.
+4. /help for more information.
+
+
+> SQLの実行結果の複数のCSVをエクセルに取り込むための、エクセルのVBAファイルを作成してください。
+  CSVの区切り文字はカンマで、ヘッダー行を含みます。
+  取り込むCSV１つ毎に毎回新しいシートをファイル名から作ってください。
+
+✦ 承知いたしました。複数のCSVファイルを一度に選択し、それぞれをファイル名をシート名として新しいシートにインポート
+  するExcel VBAコードを作成します。
+
+  以下に、VBAコードとその使い方を記載します。
+
+  ---
+
+  完成したVBAコード
+
+  このコードをコピーして、お使いのエクセルのVBAエディタに貼り付けてください。
+
+
+
+   ... first 70 lines hidden ...
+    71                     .RefreshOnFileOpen = False
+    72                     .RefreshStyle = xlInsertDeleteCells
+    73                     .SavePassword = False
+    74                     .SaveData = True
+    75                     .AdjustColumnWidth = True
+    76                     .RefreshPeriod = 0
+    77                     .TextFilePromptOnRefresh = False
+    78                     .TextFilePlatform = 65001 ' UTF-8 を指定
+    79                     .TextFileStartRow = 1
+    80                     .TextFileParseType = xlDelimited
+    81                     .TextFileTextQualifier = xlTextQualifierDoubleQuote
+    82                     .TextFileConsecutiveDelimiter = False
+    83                     .TextFileTabDelimiter = False
+    84                     .TextFileSemicolonDelimiter = False
+    85                     .TextFileCommaDelimiter = True ' カンマ区切りを指定
+    86                     .TextFileSpaceDelimiter = False
+    87
+    88                     ' 全ての列を文字列として取り込む（予期せぬ型変換を防ぐため）
+    89                     ' ※列数が多い場合は、必要に応じてこの部分を調整してください。
+    90                     Dim columnCount As Integer
+    91                     columnCount = GetCsvColumnCount(fullFilePath)
+    92                     If columnCount > 0 Then
+    93                         Dim dataTypes() As Long
+    94                         ReDim dataTypes(1 To columnCount)
+    95                         Dim i As Integer
+    96                         For i = 1 To columnCount
+    97                             dataTypes(i) = xlTextFormat ' xlTextFormatは「2」
+    98                         Next i
+    99                         .TextFileColumnDataTypes = dataTypes
+   100                     End If
+   101
+   102                     .Refresh BackgroundQuery:=False ' 同期処理で実行
+   103                     .Delete ' インポート後に接続情報を削除
+   104                 End With
+   105             Next selectedFile
+   106
+   107             MsgBox "CSVファイルのインポートが完了しました。", vbInformation
+   108
+   109         Else ' 「キャンセル」がクリックされた場合
+   110             MsgBox "処理はキャンセルされました。", vbInformation
+   111         End If
+   112     End With
+   113
+   114     ' --- 後処理 ---
+   115     Set fileDialog = Nothing
+   116     Set newSheet = Nothing
+   117     Application.ScreenUpdating = True ' 画面更新を再開
+   118
+   119 End Sub
+   120
+   121 ' シート名に使えない文字を置換する補助関数
+   122 Private Function ReplaceCharsForSheetName(ByVal name As String) As String
+   123     Dim invalidChars As String
+   124     Dim i As Integer
+   125     invalidChars = ":\/?*[]" ' シート名に使えない文字
+   126
+   127     For i = 1 To Len(invalidChars)
+   128         name = Replace(name, Mid(invalidChars, i, 1), "_")
+   129     Next i
+   130     ReplaceCharsForSheetName = name
+   131 End Function
+   132
+   133 ' 重複しないユニークなシート名を返す補助関数
+   134 Private Function GetUniqueSheetName(ByVal baseName As String) As String
+   135     Dim tempName As String
+   136     Dim counter As Integer
+   137     Dim ws As Worksheet
+   138     Dim isUnique As Boolean
+   139
+   140     tempName = baseName
+   141     counter = 1
+   142
+   143     Do
+   144         isUnique = True
+   145         For Each ws In ThisWorkbook.Worksheets
+   146             If LCase(ws.Name) = LCase(tempName) Then
+   147                 isUnique = False
+   148                 Exit For
+   149             End If
+   150         Next ws
+   151
+   152         If Not isUnique Then
+   153             counter = counter + 1
+   154             tempName = Left(baseName, 31 - Len(CStr(counter)) - 2) & " (" & CStr(counter) & ")"
+   155         End If
+   156     Loop While Not isUnique
+   157
+   158     GetUniqueSheetName = tempName
+   159 End Function
+   160
+   161 ' CSVファイルの列数を取得する補助関数
+   162 Private Function GetCsvColumnCount(ByVal filePath As String) As Integer
+   163     On Error GoTo ErrorHandler
+   164     Dim fso As Object
+   165     Dim fileStream As Object
+   166     Dim firstLine As String
+   167
+   168     Set fso = CreateObject("Scripting.FileSystemObject")
+   169     Set fileStream = fso.OpenTextFile(filePath, 1) ' ForReading
+   170
+   171     If Not fileStream.AtEndOfStream Then
+   172         firstLine = fileStream.ReadLine
+   173         GetCsvColumnCount = UBound(Split(firstLine, ",")) + 1
+   174     Else
+   175         GetCsvColumnCount = 0
+   176     End If
+   177
+   178     fileStream.Close
+   179     Set fso = Nothing
+   180     Set fileStream = Nothing
+   181     Exit Function
+   182
+   183 ErrorHandler:
+   184     GetCsvColumnCount = 0 ' エラー時は0を返す
+   185 End Function
+
+
+  ---
+
+  使い方
+
+   1. Excelを開く:
+       * 新しいExcelブックを開くか、マクロを追加したい既存のブックを開きます。
+
+
+   2. VBAエディタを開く:
+       * キーボードで Alt + F11 を押して、VBAエディタ（Visual Basic for Applications Editor）を開きます。
+
+
+   3. 標準モジュールを挿入する:
+       * VBAエディタのメニューから 挿入(I) > 標準モジュール(M) を選択します。
+       * 右側に Module1 という名前の白いコードウィンドウが表示されます。
+
+   4. コードを貼り付ける:
+       * 上記のVBAコードをすべてコピーし、Module1 のコードウィンドウに貼り付けます。
+
+
+   5. マクロを実行する:
+       * Excelのウィンドウに戻ります。
+       * 開発 タブをクリックし、マクロ を選択します。（開発タブが表示されていない場合は、ファイル > オプション >
+         リボンのユーザー設定 で 開発 にチェックを入れてください）
+       * または、キーボードで Alt + F8 を押してマクロ一覧ダイアログを開きます。
+       * ImportCsvFiles というマクロを選択し、実行 ボタンをクリックします。
+
+
+   6. CSVファイルを選択する:
+       * ファイル選択ダイアログが表示されます。
+       * インポートしたいCSVファイルを Ctrl キーや Shift キーを使って複数選択し、開く ボタンをクリックします。
+
+
+   7. 完了:
+       * 処理が完了すると、選択したCSVファイルごとに新しいシートが作成され、データがインポートされます。
+
+
+  注意点
+   * マクロ有効ブックとして保存: このマクロを今後も使いたい場合は、ファイルを保存する際に種類を Excel
+     マクロ有効ブック (*.xlsm) にして保存してください。
+   * データ型: このコードでは、Excelが自動でデータ型を判断して「0」で始まる数字の「0」を消してしまったり、長い数
+     値を指数表示にしたりするのを防ぐため、全ての列を「文字列」としてインポートするように設定しています。もし数値
+     として計算したい場合は、インポート後に手動でデータ型を変更してください。
+
+
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ >   Type your message or @path/to/file                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+/usr/local/src/dev/geminicode/csvtoexcel2       no sandbox (see /docs)         gemini-2.5-pro (99% context left)

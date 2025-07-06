@@ -1,0 +1,312 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+新機能と改善のために最新の PowerShell をインストールしてください!https://aka.ms/PSWindows
+
+PS C:\Users\USER> wsl
+test@DESKTOP-BLLSTN7:/mnt/c/Users/USER$ cd \\wsl.localhost\Ubuntu\usr\local\src\dev\
+> ^C
+test@DESKTOP-BLLSTN7:/mnt/c/Users/USER$ cd /usr/local/src/dev/claudecode
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/claudecode$ ls
+mapping1  mapping2
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/claudecode$ cd ..
+test@DESKTOP-BLLSTN7:/usr/local/src/dev$ ks
+-bash: ks: command not found
+test@DESKTOP-BLLSTN7:/usr/local/src/dev$ ls
+app  claudecode  devapp  geminicode  pj001_objdetect
+test@DESKTOP-BLLSTN7:/usr/local/src/dev$ cd  geminicode
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ ls
+gemini-cli  samp20250628
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ mkdir snow1
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ ls
+gemini-cli  samp20250628  snow1
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode$ cd snow1
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode/snow1$ ls
+test@DESKTOP-BLLSTN7:/usr/local/src/dev/geminicode/snow1$ gemini
+
+ ███            █████████  ██████████ ██████   ██████ █████ ██████   █████ █████
+░░░███         ███░░░░░███░░███░░░░░█░░██████ ██████ ░░███ ░░██████ ░░███ ░░███
+  ░░░███      ███     ░░░  ░███  █ ░  ░███░█████░███  ░███  ░███░███ ░███  ░███
+    ░░░███   ░███          ░██████    ░███░░███ ░███  ░███  ░███░░███░███  ░███
+     ███░    ░███    █████ ░███░░█    ░███ ░░░  ░███  ░███  ░███ ░░██████  ░███
+   ███░      ░░███  ░░███  ░███ ░   █ ░███      ░███  ░███  ░███  ░░█████  ░███
+ ███░         ░░█████████  ██████████ █████     █████ █████ █████  ░░█████ █████
+░░░            ░░░░░░░░░  ░░░░░░░░░░ ░░░░░     ░░░░░ ░░░░░ ░░░░░    ░░░░░ ░░░░░
+
+
+Tips for getting started:
+1. Ask questions, edit files, or run commands.
+2. Be specific for the best results.
+3. Create GEMINI.md files to customize your interactions with Gemini.
+4. /help for more information.
+
+
+> /init
+
+✕ Unknown command: /init
+
+
+> snowflakeのCLIでSQLで取得した結果をCSVファイルで、Linuxファイル上に出力するshellを作成してください。
+
+✦ はい、承知いたしました。SnowflakeのCLI（snowsql）を使い、クエリ結果をCSVファイルに出力するシェルスクリプトを作
+  成します。
+
+
+  スクリプト名は snowflake_query_to_csv.sh
+  とします。このスクリプトには、アカウント情報、SQLクエリ、出力ファイル名を指定するための変数が含まれています。
+
+  以下の内容でファイルを作成します。
+
+
+ ╭───────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✔  WriteFile Writing to snowflake_query_to_csv.sh                                                     │
+ │                                                                                                       │
+ │    Error: File path must be absolute: snowflake_query_to_csv.sh                                       │
+ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ すみません、ファイルのパスを絶対パスで指定する必要がありました。現在のディレクトリ
+  /usr/local/src/dev/geminicode/snow1 に snowflake_query_to_csv.sh を作成します。
+ ╭───────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✔  WriteFile Writing to snowflake_query_to_csv.sh                                                     │
+ │                                                                                                       │
+ │     1 #!/bin/bash                                                                                     │
+ │     2                                                                                                 │
+ │     3 # スクリプトのいずれかのコマンドが失敗した場合に終了します。                                    │
+ │     4 set -e                                                                                          │
+ │     5                                                                                                 │
+ │     6 # --- 設定項目 ---                                                                              │
+ │     7 # ご自身のSnowflake環境に合わせて以下の変数を設定してください。                                 │
+ │     8                                                                                                 │
+ │     9 # Snowflakeアカウント名 (例: xy12345.ap-northeast-1.aws)                                        │
+ │    10 SNOWFLAKE_ACCOUNT="<your_account_name>"                                                         │
+ │    11                                                                                                 │
+ │    12 # Snowflakeユーザー名                                                                           │
+ │    13 SNOWFLAKE_USER="<your_username>"                                                                │
+ │    14                                                                                                 │
+ │    15 # 使用するウェアハウス                                                                          │
+ │    16 SNOWFLAKE_WAREHOUSE="<your_warehouse>"                                                          │
+ │    17                                                                                                 │
+ │    18 # 対象のデータベース                                                                            │
+ │    19 SNOWFLAKE_DATABASE="<your_database>"                                                            │
+ │    20                                                                                                 │
+ │    21 # 対象のスキーマ                                                                                │
+ │    22 SNOWFLAKE_SCHEMA="<your_schema>"                                                                │
+ │    23                                                                                                 │
+ │    24 # 実行したいSQLクエリ                                                                           │
+ │    25 # ヒアドキュメント(<<SQL)内にクエリを記述してください。                                         │
+ │    26 read -r -d '' SQL_QUERY << SQL                                                                  │
+ │    27 SELECT * FROM your_table LIMIT 100;                                                             │
+ │    28 SQL                                                                                             │
+ │    29                                                                                                 │
+ │    30 # 出力するCSVファイル名                                                                         │
+ │    31 OUTPUT_FILE="output.csv"                                                                        │
+ │    32                                                                                                 │
+ │    33 # --- スクリプト本体 ---                                                                        │
+ │    34                                                                                                 │
+ │    35 echo "Snowflakeへの接続を開始します..."                                                         │
+ │    36                                                                                                 │
+ │    37 # snowsqlコマンドを実行                                                                         │
+ │    38 # SNOWSQL_PWD環境変数にパスワードを設定すると、パスワードプロンプトを省略できます。             │
+ │    39 # 例: export SNOWSQL_PWD='your_password'                                                        │
+ │    40 snowsql \                                                                                       │
+ │    41   -a "${SNOWFLAKE_ACCOUNT}" \                                                                   │
+ │    42   -u "${SNOWFLAKE_USER}" \                                                                      │
+ │    43   -w "${SNOWFLAKE_WAREHOUSE}" \                                                                 │
+ │    44   -d "${SNOWFLAKE_DATABASE}" \                                                                  │
+ │    45   -s "${SNOWFLAKE_SCHEMA}" \                                                                    │
+ │    46   -q "${SQL_QUERY}" \                                                                           │
+ │    47   -o output_format=csv \                                                                        │
+ │    48   -o header=true \                                                                              │
+ │    49   -o timing=false \                                                                             │
+ │    50   -o friendly=false \                                                                           │
+ │    51   > "${OUTPUT_FILE}"                                                                            │
+ │    52                                                                                                 │
+ │    53 echo "クエリが正常に実行され、結果が'${OUTPUT_FILE}'に出力されました。"                         │
+ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ ファイルを作成しました。
+
+
+  次に、このシェルスクリプトに実行権限を付与する必要があります。以下のコマンドで権限を付与します。
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✔  Shell chmod +x /usr/local/src/dev/geminicode/snow1/snowflake_query_to_csv.sh (Make the shell script execut…  │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ 実行権限を付与しました。
+
+
+  これで、snowflake_query_to_csv.sh を実行する準備が整いました。
+
+  ご使用方法:
+
+
+   1. snowflake_query_to_csv.sh
+      ファイルを開き、ご自身のSnowflake接続情報（アカウント名、ユーザー名など）と実行したいSQLクエリを編集します。
+   2. ターミナルで以下のコマンドを実行します。
+
+
+
+   1     ./snowflake_query_to_csv.sh
+
+
+  これにより、指定したSQLクエリが実行され、結果が output.csv という名前のCSVファイルに出力されます。
+
+
+  何かご不明な点があれば、お気軽にご質問ください。
+
+> 作成した@snowflake_query_to_csv.sh について詳しく解説してください。
+
+✦ はい、承知いたしました。先ほど作成した snowflake_query_to_csv.sh
+  スクリプトについて、各部分が何をしているのかを詳しく解説します。
+
+  ---
+
+
+  snowflake_query_to_csv.sh の解説
+
+  このスクリプトは、Snowflakeに接続し、指定したSQLクエリを実行して、その結果をCSV形式でファイルに出力するための
+  一連のコマンドを自動化するものです。
+
+
+   1 #!/bin/bash
+
+
+
+   - シェバン (Shebang): スクリプトの1行目に書くお決まりの記述です。このファイルが bash
+     シェルによって実行されるべきことをシステムに伝えます。
+
+  ---
+
+
+   1 # スクリプトのいずれかのコマンドが失敗した場合に終了します。
+   2 set -e
+
+
+
+   - エラーハンドリング: このコマンドは、スクリプト内で実行されるいずれかのコマンドがエラーで終了した場合（専門的
+     には「終了コードが0以外」の場合）、スクリプト全体を直ちに停止させるためのものです。
+   - なぜ重要か？:
+     これがないと、例えばSnowflakeへの接続に失敗しても後続の処理が実行されてしまい、意図しない結果（例:
+     空のファイルが作成される）になるのを防ぎます。
+
+  ---
+
+
+
+    1 # --- 設定項目 ---
+    2 # ご自身のSnowflake環境に合わせて以下の変数を設定してください。
+    3
+    4 # Snowflakeアカウント名 (例: xy12345.ap-northeast-1.aws)
+    5 SNOWFLAKE_ACCOUNT="<your_account_name>"
+    6
+    7 # Snowflakeユーザー名
+    8 SNOWFLAKE_USER="<your_username>"
+    9
+   10 # (以下、同様の変数設定...)
+
+
+
+   - 設定セクション: この部分は、スクリプトの動作をカスタマイズするための「変数」を定義しています。
+   - SNOWFLAKE_ACCOUNT や SNOWFLAKE_USER などの変数に、ご自身の接続情報を設定します。
+   - このように設定をスクリプトの先頭にまとめることで、スクリプトの本体（ロジック部分）を変更することなく、接続先
+     やクエリを簡単に変更できます。
+
+  ---
+
+
+
+   1 # 実行したいSQLクエリ
+   2 # ヒアドキュメント(<<SQL)内にクエリを記述してください。
+   3 read -r -d '' SQL_QUERY << SQL
+   4 SELECT * FROM your_table LIMIT 100;
+   5 SQL
+
+
+
+   - SQLクエリの定義: ここでは、実行したいSQLクエリを変数 SQL_QUERY に格納しています。
+   - ヒアドキュメント (`<< SQL`):
+     この書き方は「ヒアドキュメント」と呼ばれ、複数行にわたる長い文字列を記述するのに非常に便利です。<< SQL
+     から始まり、次に出てくる SQL だけの行までのすべてが SQL_QUERY 変数の中身になります。
+   - 利点: 複雑なSQLクエリを、見た目も分かりやすく、クォーテーションなどを気にせずに記述できます。
+
+  ---
+
+
+   1 # 出力するCSVファイル名
+   2 OUTPUT_FILE="output.csv"
+
+
+
+   - 出力ファイル名: 結果を保存するファイル名を OUTPUT_FILE 変数に設定します。
+
+  ---
+
+
+
+   1 # --- スクリプト本体 ---
+   2
+   3 echo "Snowflakeへの接続を開始します..."
+   4
+   5 # snowsqlコマンドを実行
+   6 # (snowsqlコマンド本体)
+   7
+   8 echo "クエリが正常に実行され、結果が'${OUTPUT_FILE}'に出力されました。"
+
+
+   - スクリプトの実行部分: ここからが、実際に処理を行う中心部分です。
+   - echo コマンドは、進捗状況を画面に表示するためのものです。
+
+  ---
+
+
+
+    1 snowsql \
+    2   -a "${SNOWFLAKE_ACCOUNT}" \
+    3   -u "${SNOWFLAKE_USER}" \
+    4   -w "${SNOWFLAKE_WAREHOUSE}" \
+    5   -d "${SNOWFLAKE_DATABASE}" \
+    6   -s "${SNOWFLAKE_SCHEMA}" \
+    7   -q "${SQL_QUERY}" \
+    8   -o output_format=csv \
+    9   -o header=true \
+   10   -o timing=false \
+   11   -o friendly=false \
+   12   > "${OUTPUT_FILE}"
+
+
+
+   - `snowsql` コマンド: これがスクリプトの心臓部です。
+       - \ (バックスラッシュ):
+         コマンドが長くなるため、行末に置くことで「次の行に続く」ことを示し、見やすくしています。
+       - -a, -u, -w, -d, -s: それぞれ、アカウント、ユーザー、ウェアハウス、データベース、スキーマを指定するオプシ
+         ョンです。"${変数名}" の形で、設定セクションで定義した変数の値を渡しています。
+
+       - -q "${SQL_QUERY}": -q はクエリ（Query）を指定するオプションです。ヒアドキュメントで作成した SQL_QUERY
+         変数の内容（つまり、実行したいSQL文）を渡します。
+       - -o <オプション名>=<値>: -o は出力（Output）に関する様々な設定を行うオプションです。
+           - output_format=csv: これが最も重要です。 出力形式をCSVに指定します。
+           - header=true: CSVの1行目に列名（ヘッダー）を含めるようにします。
+           - timing=false: クエリの実行時間などの余分な情報を非表示にします。
+           - friendly=false: snowsql
+             がデフォルトで表示するテーブルの罫線などを非表示にし、純粋なCSVデータのみが出力されるようにします。
+       - > "${OUTPUT_FILE}": リダイレクト と呼ばれるシェルの機能です。snowsql
+         コマンドの標準出力（画面に表示される結果）を、> の右側で指定されたファイル（この場合は
+         output.csv）に書き込みます。これにより、クエリ結果がファイルとして保存されます。
+
+  まとめ
+
+  このスクリプトは、以下の流れで動作します。
+
+
+   1. 設定の読み込み: シェル変数から接続情報やSQLクエリを読み込む。
+   2. Snowflakeへの接続とクエリ実行: snowsql コマンドを使い、指定された情報でSnowflakeに接続し、クエリを実行する。
+   3. CSV形式での出力: クエリ結果を、ヘッダー付きで、余分な情報がないクリーンなCSV形式で出力する。
+   4. ファイルへの保存: 出力されたCSVデータを、指定されたファイル名で保存する。
+
+
+  このように、一度設定してしまえば、誰でも簡単に同じ手順でデータを抽出できる、再利用性の高いスクリプトになって
+  います。
+
+                                                                         accepting edits (shift + tab to toggle)
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ >   Type your message or @path/to/file                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+/usr/local/src/dev/geminicode/snow1          no sandbox (see /docs)            gemini-2.5-pro (99% context left)
